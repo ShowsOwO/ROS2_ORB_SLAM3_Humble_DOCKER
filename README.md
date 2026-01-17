@@ -35,7 +35,7 @@
    source install/setup.bash
    ```
    
-##🚀 运行指南 (Usage)
+## 🚀 运行指南 (Usage)
 1. 启动仿真环境
 ⚠️ 注意：为了更容易初始化 SLAM，建议使用纹理丰富的环境（如 turtlebot3_house），避免使用默认的空旷环境。
 
@@ -71,7 +71,7 @@ ros2 run turtlebot3_teleop teleop_keyboard
 
 当看到绿色的特征点出现，且状态从 WAITING FOR IMAGES 变为建图状态，即表示初始化成功。
 
-##⚙️ 配置文件说明 (Important)
+## ⚙️ 配置文件说明 (Important)
 在 config/my_robot_cam.yaml 中，有一个关键的注意事项： 即使使用单目 (Monocular) 模式，ORB-SLAM3 的底层逻辑依然要求内参参数以 Camera1 开头，否则会报错。
 
 正确示例：
@@ -82,7 +82,7 @@ Camera.type: "PinHole"
 Camera1.fx: 554.25469  # 必须叫 Camera1
 Camera1.fy: 554.25469
 ```
-##📝 常见问题 (Troubleshooting)
+## 📝 常见问题 (Troubleshooting)
 Q: 画面显示 "WAITING FOR IMAGES" 且不初始化？ A:
 
 检查 YAML 文件中的分辨率是否与相机发布的分辨率一致。
@@ -91,5 +91,5 @@ Q: 画面显示 "WAITING FOR IMAGES" 且不初始化？ A:
 
 检查是否开启了 use_sim_time:=true。
 
-👏 致谢
+## 👏 致谢
 本项目基于 [ORB_SLAM3](https://github.com/UZ-SLAMLab/ORB_SLAM3) 原作修改适配。
