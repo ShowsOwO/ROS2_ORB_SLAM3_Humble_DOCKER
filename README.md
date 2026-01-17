@@ -1,6 +1,7 @@
 # ROS 2 Humble ORB-SLAM3 Wrapper (Docker Ready)
 
 这是一个适用于 **ROS 2 Humble** 的 [ORB-SLAM3](https://github.com/UZ-SLAMLab/ORB_SLAM3) 封装节点。
+仅用于个人学习。
 本项目已在 Ubuntu 22.04 (ROS 2 Humble) 环境下，配合 TurtleBot3 仿真通过测试。
 
 ![ROS2](https://img.shields.io/badge/ROS2-Humble-blue)
@@ -37,6 +38,7 @@
    
 ## 🚀 运行指南 (Usage)
 1. 启动仿真环境
+
 ⚠️ 注意：为了更容易初始化 SLAM，建议使用纹理丰富的环境（如 turtlebot3_house），避免使用默认的空旷环境。
 
   ```bash
@@ -83,11 +85,11 @@ Camera1.fx: 554.25469  # 必须叫 Camera1
 Camera1.fy: 554.25469
 ```
 ## 📝 常见问题 (Troubleshooting)
-Q: 画面显示 "WAITING FOR IMAGES" 且不初始化？ A:
+Q: 画面显示 "WAITING FOR IMAGES" 且不初始化？
 
-检查 YAML 文件中的分辨率是否与相机发布的分辨率一致。
+A:检查 YAML 文件中的分辨率是否与相机发布的分辨率一致。
 
-检查 Gazebo 环境是否纹理太少（由于 ORB 特征点提取困难）。尝试将机器人移动到纹理复杂的区域。
+检查 Gazebo 环境是否纹理太少（由于 ORB 特征点提取困难）,尝试将机器人移动到纹理复杂的区域。
 
 检查是否开启了 use_sim_time:=true。
 
