@@ -1,114 +1,95 @@
-# ORB_SLAM3_ROS2
-This repository is ROS2 wrapping to use ORB_SLAM3
+# ROS 2 Humble ORB-SLAM3 Wrapper (Docker Ready)
 
----
+这是一个适用于 **ROS 2 Humble** 的 [ORB-SLAM3](https://github.com/UZ-SLAMLab/ORB_SLAM3) 封装节点。
+本项目已在 Ubuntu 22.04 (ROS 2 Humble) 环境下，配合 TurtleBot3 仿真通过测试。
 
-## Demo Video
-[![orbslam3_ros2](https://user-images.githubusercontent.com/31432135/220839530-786b8a28-d5af-4aa5-b4ed-6234c2f4ca33.PNG)](https://www.youtube.com/watch?v=zXeXL8q72lM)
+![ROS2](https://img.shields.io/badge/ROS2-Humble-blue)
+![License](https://img.shields.io/badge/License-GPLv3-green)
 
-## Prerequisites
-- I have tested on below version.
-  - Ubuntu 20.04
-  - ROS2 foxy
-  - OpenCV 4.2.0
+## ✨ 主要功能
+- 支持单目 (Monocular) 模式（已测试）。
+- 解决了 ROS 2 Image 消息到 OpenCV 格式的转换问题。
+- 修复了原始 ORB-SLAM3 在单目模式下强制要求 `Camera1` 参数命名的问题。
+- 提供了针对 Gazebo 仿真环境的配置文件。
 
-- Build ORB_SLAM3
-  - Go to this [repo](https://github.com/zang09/ORB-SLAM3-STEREO-FIXED) and follow build instruction.
+## 🛠️ 依赖项 (Prerequisites)
+在编译此包之前，请确保你已经安装并编译了原始的 ORB-SLAM3 库。
 
-- Install related ROS2 package
-```
-$ sudo apt install ros-$ROS_DISTRO-vision-opencv && sudo apt install ros-$ROS_DISTRO-message-filters
-```
+- **ROS 2 Humble**
+- **OpenCV 4.x**
+- **Pangolin**
+- **ORB_SLAM3** (核心库)
 
-## How to build
-1. Clone repository to your ROS workspace
-```
-$ mkdir -p colcon_ws/src
-$ cd ~/colcon_ws/src
-$ git clone https://github.com/zang09/ORB_SLAM3_ROS2.git orbslam3_ros2
-```
+## 📦 安装编译
 
-2. Change this [line](https://github.com/zang09/ORB_SLAM3_ROS2/blob/ee82428ed627922058b93fea1d647725c813584e/CMakeLists.txt#L5) to your own `python site-packages` path
+1. **克隆代码到工作空间**
+   ```bash
+   cd ~/ros2_orb_ws/src
+   git clone [https://github.com/ShowsOwO/ROS2_ORB_SLAM3_Humble_DOCKER.git](https://github.com/ShowsOwO/ROS2_ORB_SLAM3_Humble_DOCKER.git)
+   ```
+   
+2. **编译**
+   ```bash
+   cd ~/ros2_orb_ws
+   colcon build --symlink-install --packages-select orbslam3
+   source install/setup.bash
+   ```
+   
+##🚀 运行指南 (Usage)
+1. 启动仿真环境
+⚠️ 注意：为了更容易初始化 SLAM，建议使用纹理丰富的环境（如 turtlebot3_house），避免使用默认的空旷环境。
 
-3. Change this [line](https://github.com/zang09/ORB_SLAM3_ROS2/blob/ee82428ed627922058b93fea1d647725c813584e/CMakeModules/FindORB_SLAM3.cmake#L8) to your own `ORB_SLAM3` path
+  ```bash
 
-Now, you are ready to build!
-```
-$ cd ~/colcon_ws
-$ colcon build --symlink-install --packages-select orbslam3
-```
+  export TURTLEBOT3_MODEL=waffle
+  ros2 launch turtlebot3_gazebo turtlebot3_house.launch.py
+  ```
 
-## Troubleshootings
-1. If you cannot find `sophus/se3.hpp`:  
-Go to your `ORB_SLAM3_ROOT_DIR` and install sophus library.
-```
-$ cd ~/{ORB_SLAM3_ROOT_DIR}/Thirdparty/Sophus/build
-$ sudo make install
-```
+2. 启动 ORB-SLAM3 节点
+需要提供 词袋文件 (Vocabulary) 和 参数文件 (.yaml) 的绝对路径。
 
-2. Please compile with `OpenCV 4.2.0` version.
-Refer this [#issue](https://github.com/zang09/ORB_SLAM3_ROS2/issues/2#issuecomment-1251850857)
-
-## How to use
-1. Source the workspace  
-```
-$ source ~/colcon_ws/install/local_setup.bash
-```
-
-2. Run orbslam mode, which you want.  
-This repository only support `MONO, STEREO, RGBD, STEREO-INERTIAL` mode now.  
-You can find vocabulary file and config file in here. (e.g. `orbslam3_ros2/vocabulary/ORBvoc.txt`, `orbslam3_ros2/config/monocular/TUM1.yaml` for monocular SLAM).
-  - `MONO` mode  
-```
-$ ros2 run orbslam3 mono PATH_TO_VOCABULARY PATH_TO_YAML_CONFIG_FILE
-```
-  - `STEREO` mode  
-```
-$ ros2 run orbslam3 stereo PATH_TO_VOCABULARY PATH_TO_YAML_CONFIG_FILE BOOL_RECTIFY
-```
-  - `RGBD` mode  
-```
-$ ros2 run orbslam3 rgbd PATH_TO_VOCABULARY PATH_TO_YAML_CONFIG_FILE
-```
-  - `STEREO-INERTIAL` mode  
-```
-$ ros2 run orbslam3 stereo-inertial PATH_TO_VOCABULARY PATH_TO_YAML_CONFIG_FILE BOOL_RECTIFY [BOOL_EQUALIZE]
+```bash
+# 请根据你的实际路径修改参数
+ros2 run orbslam3 mono \
+    /path/to/ORBvoc.txt \
+    ~/ros2_orb_ws/src/ROS2_ORB_SLAM3_Humble_DOCKER/config/my_robot_cam.yaml \
+    --ros-args -p use_sim_time:=true
 ```
 
-## Run with rosbag
-To play ros1 bag file, you should install `ros1 noetic` & `ros1 bridge`.  
-Here is a [link](https://www.theconstructsim.com/ros2-qa-217-how-to-mix-ros1-and-ros2-packages/) to demonstrate example of `ros1-ros2 bridge` procedure.  
-If you have `ros1 noetic` and `ros1 bridge` already, open your terminal and follow this:  
-(Shell A, B, C, D is all different terminal, e.g. `stereo-inertial` mode)
-1. Download EuRoC Dataset (`V1_02_medium.bag`)
-```
-$ wget -P ~/Downloads http://robotics.ethz.ch/~asl-datasets/ijrr_euroc_mav_dataset/vicon_room1/V1_02_medium/V1_02_medium.bag
-```  
+3. 控制机器人进行初始化
+打开一个新的终端启动键盘控制：
 
-2. Launch Terminal  
-(e.g. `ROS1_INSTALL_PATH`=`/opt/ros/noetic`, `ROS2_INSTALL_PATH`=`/opt/ros/foxy`)
-```
-#Shell A:
-source ${ROS1_INSTALL_PATH}/setup.bash
-roscore
-
-#Shell B:
-source ${ROS1_INSTALL_PATH}/setup.bash
-source ${ROS2_INSTALL_PATH}/setup.bash
-export ROS_MASTER_URI=http://localhost:11311
-ros2 run ros1_bridge dynamic_bridge
-
-#Shell C:
-source ${ROS1_INSTALL_PATH}/setup.bash
-rosbag play ~/Downloads/V1_02_medium.bag --pause /cam0/image_raw:=/camera/left /cam1/image_raw:=/camera/right /imu0:=/imu
-
-#Shell D:
-source ${ROS2_INSTALL_PATH}/setup.bash
-ros2 run orbslam3 stereo-inertial PATH_TO_VOCABULARY PATH_TO_YAML_CONFIG_FILE BOOL_RECTIFY [BOOL_EQUALIZE]
+```Bash
+ros2 run turtlebot3_teleop teleop_keyboard
 ```
 
-3. Press `spacebar` in `Shell C` to resume bag file.  
+初始化技巧：
 
-## Acknowledgments
-This repository is modified from [this](https://github.com/curryc/ros2_orbslam3) repository.  
-To add `stereo-inertial` mode and improve build difficulites.
+确保 DEBUG_VIEW 窗口能看到明显的纹理（如书架、墙角），不要对着纯色的墙或圆柱体。
+
+控制机器人左右旋转或轻微前后移动。
+
+当看到绿色的特征点出现，且状态从 WAITING FOR IMAGES 变为建图状态，即表示初始化成功。
+
+##⚙️ 配置文件说明 (Important)
+在 config/my_robot_cam.yaml 中，有一个关键的注意事项： 即使使用单目 (Monocular) 模式，ORB-SLAM3 的底层逻辑依然要求内参参数以 Camera1 开头，否则会报错。
+
+正确示例：
+
+```YAML
+
+Camera.type: "PinHole"
+Camera1.fx: 554.25469  # 必须叫 Camera1
+Camera1.fy: 554.25469
+```
+##📝 常见问题 (Troubleshooting)
+Q: 画面显示 "WAITING FOR IMAGES" 且不初始化？ A:
+
+检查 YAML 文件中的分辨率是否与相机发布的分辨率一致。
+
+检查 Gazebo 环境是否纹理太少（由于 ORB 特征点提取困难）。尝试将机器人移动到纹理复杂的区域。
+
+检查是否开启了 use_sim_time:=true。
+
+👏 致谢
+本项目基于 [ORB_SLAM3](https://github.com/UZ-SLAMLab/ORB_SLAM3) 原作修改适配。
